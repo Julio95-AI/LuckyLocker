@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LuckyLocker - 幸运格子柜抽奖</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 500px;
+            width: 100%;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            padding: 30px;
+            margin-top: 20px;
+        }
+        
+        h1 {
+            text-align: center;
+            color: #667eea;
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+        
+        .status-bar {
+            background: #f0f0f0;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .status-bar p {
+            margin: 5px 0;
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .status-bar .highlight {
+            color: #667eea;
+            font-weight: bold;
+            font-size: 18px;
+        }
+        
+        .locker-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin: 30px 0;
+        }
+        
+        .locker-cell {
+            aspect-ratio: 1;
+            border: 3px solid #ddd;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            font-weight: bold;
+            color: #999;
+            background: #f9f9f9;
+            transition: all 0.3s ease;
+        }
+        
+        .locker-cell.winner {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-color: #667eea;
+            animation: pulse 1s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        
+        .result-box {
+            background: #f0f9ff;
+            border: 2px solid #667eea;
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+            display: none;
+        }
+        
+        .result-box.show {
+            display: block;
+            animation: slideIn 0.5s ease;
+        }
+        
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .result-box h2 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 22px;
+        }
+        
+        .password-display {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            margin: 15px 0;
+        }
+        
+        .password-display .label {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+        
+        .password-display .code {
+            font-size: 36px;
+            font-weight: bold;
+            color: #667eea;
+            letter-spacing: 5px;
+        }
+        
+        .tips {
+            background: #fff9e6;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+        
+        .tips h3 {
+            color: #f57c00;
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+        
+        .tips ol {
+            margin-left: 20px;
+            color: #666;
+            font-size: 14px;
+            line-height: 1.8;
+        }
+        
+        .draw-button {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .draw-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .draw-button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .error-message {
+            background: #ffebee;
+            color: #c62828;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+            display: none;
+        }
+        
+        .error-message.show {
+            display: block;
+        }
+        
+        .order-input-section {
+            margin: 20px 0;
+            padding: 15px;
+            background: #f5f5f5;
+            border-radius: 10px;
+        }
+        
+        .order-input-section h3 {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 10px;
+        }
+        
+        .order-input-section input {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        
+        .retry-button {
+            width: 100%;
+            padding: 12px;
+            background: white;
+            color: #667eea;
+            border: 2px solid #667eea;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 15px;
+        }
+        
+        .footer {
+            text-align: center;
+            color: white;
+            margin-top: 20px;
+            font-size: 14px;
+            opacity: 0.8;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎁 幸运格子柜</h1>
+        
+        <div class="status-bar">
+            <p>今日已产生 <span class="highlight" id="todayCount">0</span> 位幸运顾客</p>
+            <p>产品：<span id="productList">加载中...</span></p>
+        </div>
+        
+        <div class="locker-grid" id="lockerGrid">
+            <div class="locker-cell">1</div>
+            <div class="locker-cell">2</div>
+            <div class="locker-cell">3</div>
+            <div class="locker-cell">4</div>
+            <div class="locker-cell">5</div>
+            <div class="locker-cell">6</div>
+            <div class="locker-cell">7</div>
+            <div class="locker-cell">8</div>
+        </div>
+        
+        <div class="result-box" id="resultBox">
+            <h2>🎉 恭喜中奖！</h2>
+            <div class="password-display">
+                <div class="label">您的开锁密码：</div>
+                <div class="code" id="passwordCode">2-038</div>
+            </div>
+            <p style="color: #666; text-align: center; font-size: 14px;">
+                请凭此密码到格子柜取货
+            </p>
+        </div>
+        
+        <div class="error-message" id="errorMessage"></div>
+        
+        <button class="draw-button" id="drawButton">立即抽奖</button>
+        
+        <div class="tips">
+            <h3>💡 使用说明</h3>
+            <ol>
+                <li>每个手机号限免费抽奖1次，乱吃抽奖即可止；</li>
+                <li>输入有效购物订单号，可免费再抽奖一次；</li>
+                <li>抽中后请及时到格子柜取货。</li>
+            </ol>
+        </div>
+        
+        <div class="order-input-section">
+            <h3>有购物订单号？输入可再抽一次：</h3>
+            <input type="text" id="orderInput" placeholder="输入有效订单号">
+            <button class="retry-button" id="retryButton">验证并再抽一次</button>
+        </div>
+    </div>
+    
+    <div class="footer">
+        <p>LuckyLocker 幸运格子柜系统</p>
+    </div>
+
+    <script>
+        const API_BASE = '';  // 同域名下，无需指定
+        
+        // 页面加载时获取状态
+        async function loadStatus() {
+            try {
+                const res = await fetch(API_BASE + '/api/status');
+                const data = await res.json();
+                
+                document.getElementById('todayCount').textContent = data.today_count || 0;
+                
+                // 检查活动状态
+                if (data.activity_status === 'finished') {
+                    showError('今天已抽完，明天再来吧！');
+                    document.getElementById('drawButton').disabled = true;
+                } else if (data.activity_status === 'disabled') {
+                    showError('活动已结束');
+                    document.getElementById('drawButton').disabled = true;
+                }
+            } catch (err) {
+                console.error('加载状态失败:', err);
+            }
+        }
+        
+        // 显示错误信息
+        function showError(message) {
+            const errorBox = document.getElementById('errorMessage');
+            errorBox.textContent = message;
+            errorBox.classList.add('show');
+            setTimeout(() => {
+                errorBox.classList.remove('show');
+            }, 5000);
+        }
+        
+        // 抽奖
+        async function draw() {
+            const button = document.getElementById('drawButton');
+            button.disabled = true;
+            button.textContent = '抽奖中...';
+            
+            try {
+                const res = await fetch(API_BASE + '/api/draw', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                const data = await res.json();
+                
+                if (data.success && data.lucky) {
+                    // 中奖了！
+                    showWinner(data.locker_id, data.order_code, data.product_name);
+                } else if (data.success && !data.lucky) {
+                    // 没中奖
+                    showError(data.message || '很遗憾，今日名额已满');
+                } else {
+                    // 失败
+                    showError(data.message || '抽奖失败');
+                    if (data.reason !== 'already_drawn') {
+                        button.disabled = false;
+                        button.textContent = '立即抽奖';
+                    }
+                }
+                
+                // 重新加载状态
+                loadStatus();
+            } catch (err) {
+                console.error('抽奖失败:', err);
+                showError('网络错误，请重试');
+                button.disabled = false;
+                button.textContent = '立即抽奖';
+            }
+        }
+        
+        // 显示中奖结果
+        function showWinner(lockerId, orderCode, productName) {
+            // 高亮格子
+            const cells = document.querySelectorAll('.locker-cell');
+            cells[lockerId - 1].classList.add('winner');
+            
+            // 显示密码
+            document.getElementById('passwordCode').textContent = orderCode;
+            document.getElementById('resultBox').classList.add('show');
+            
+            // 更新产品信息
+            if (productName) {
+                document.getElementById('productList').textContent = productName;
+            }
+        }
+        
+        // 绑定按钮事件
+        document.getElementById('drawButton').addEventListener('click', draw);
+        
+        document.getElementById('retryButton').addEventListener('click', async () => {
+            const orderCode = document.getElementById('orderInput').value.trim();
+            if (!orderCode) {
+                showError('请输入订单号');
+                return;
+            }
+            
+            try {
+                const res = await fetch(API_BASE + '/api/verify_order', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ order_code: orderCode })
+                });
+                const data = await res.json();
+                
+                if (data.valid) {
+                    // 订单有效，允许再次抽奖
+                    alert('订单验证成功！可以再抽一次');
+                    // 这里简化处理，实际应该调用特殊的再抽奖接口
+                    document.getElementById('drawButton').disabled = false;
+                    document.getElementById('drawButton').textContent = '立即抽奖';
+                } else {
+                    showError('无效的订单号');
+                }
+            } catch (err) {
+                console.error('验证失败:', err);
+                showError('验证失败，请重试');
+            }
+        });
+        
+        // 页面加载
+        loadStatus();
+    </script>
+</body>
+</html>

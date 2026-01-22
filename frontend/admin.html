@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LuckyLocker - 管理后台</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', sans-serif;
+            background: #f5f5f5;
+            padding: 20px;
+        }
+        
+        .header {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        
+        .header h1 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+        
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .tab-button {
+            padding: 10px 20px;
+            border: none;
+            background: #f0f0f0;
+            cursor: pointer;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        
+        .tab-button.active {
+            background: #667eea;
+            color: white;
+        }
+        
+        .section {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            display: none;
+        }
+        
+        .section.active {
+            display: block;
+        }
+        
+        .section h2 {
+            color: #333;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+        
+        .stat-card .value {
+            font-size: 32px;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+        
+        .stat-card .label {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        
+        .locker-list {
+            display: grid;
+            gap: 15px;
+        }
+        
+        .locker-item {
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            padding: 15px;
+            display: grid;
+            grid-template-columns: auto 1fr auto;
+            gap: 15px;
+            align-items: center;
+        }
+        
+        .locker-item .locker-id {
+            font-size: 24px;
+            font-weight: bold;
+            color: #667eea;
+            width: 50px;
+            text-align: center;
+        }
+        
+        .locker-item .locker-info {
+            flex: 1;
+        }
+        
+        .locker-item input {
+            width: 100%;
+            padding: 8px;
+            margin: 5px 0;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        
+        .locker-item button {
+            padding: 10px 20px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        
+        .locker-item button:hover {
+            background: #5568d3;
+        }
+        
+        .locker-item.unavailable {
+            background: #f5f5f5;
+            opacity: 0.7;
+        }
+        
+        .config-form {
+            max-width: 600px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 500;
+        }
+        
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        
+        .btn-primary {
+            background: #667eea;
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        
+        .btn-primary:hover {
+            background: #5568d3;
+        }
+        
+        .btn-secondary {
+            background: #f0f0f0;
+            color: #333;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-left: 10px;
+        }
+        
+        .records-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        
+        .records-table th,
+        .records-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .records-table th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .records-table tr:hover {
+            background: #f8f9fa;
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .badge-success {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .badge-secondary {
+            background: #e2e3e5;
+            color: #383d41;
+        }
+        
+        .message {
+            padding: 15px;
+            border-radius: 5px;
+            margin: 15px 0;
+            display: none;
+        }
+        
+        .message.show {
+            display: block;
+        }
+        
+        .message-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .message-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🎁 LuckyLocker 管理后台</h1>
+        <p style="color: #666; margin-top: 5px;">管理格子柜、配置活动、查看记录</p>
+        
+        <div class="tabs">
+            <button class="tab-button active" onclick="switchTab('dashboard')">仪表盘</button>
+            <button class="tab-button" onclick="switchTab('lockers')">格子管理</button>
+            <button class="tab-button" onclick="switchTab('config')">系统配置</button>
+            <button class="tab-button" onclick="switchTab('records')">抽奖记录</button>
+        </div>
+    </div>
+
+    <!-- 仪表盘 -->
+    <div class="section active" id="dashboard">
+        <h2>📊 今日数据</h2>
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="label">今日抽奖次数</div>
+                <div class="value" id="statTotalDraws">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="label">今日中奖人数</div>
+                <div class="value" id="statWinners">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="label">可用格子数</div>
+                <div class="value" id="statAvailableLockers">8</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 格子管理 -->
+    <div class="section" id="lockers">
+        <h2>🗄️ 格子柜管理</h2>
+        <button class="btn-secondary" onclick="resetAllLockers()" style="margin-bottom: 20px;">
+            重置所有格子为可用
+        </button>
+        <div id="message-lockers" class="message"></div>
+        <div class="locker-list" id="lockerList">
+            <!-- 动态加载 -->
+        </div>
+    </div>
+
+    <!-- 系统配置 -->
+    <div class="section" id="config">
+        <h2>⚙️ 系统配置</h2>
+        <div id="message-config" class="message"></div>
+        <div class="config-form">
+            <div class="form-group">
+                <label>每日中奖名额限制</label>
+                <input type="number" id="configDailyLimit" min="1" max="8" value="2">
+                <small style="color: #666; display: block; margin-top: 5px;">
+                    每天最多产生多少个幸运顾客
+                </small>
+            </div>
+            
+            <div class="form-group">
+                <label>活动状态</label>
+                <select id="configActivityStatus">
+                    <option value="active">进行中</option>
+                    <option value="finished">今日已结束</option>
+                    <option value="disabled">活动已停止</option>
+                </select>
+            </div>
+            
+            <button class="btn-primary" onclick="saveConfig()">保存配置</button>
+        </div>
+    </div>
+
+    <!-- 抽奖记录 -->
+    <div class="section" id="records">
+        <h2>📋 今日抽奖记录</h2>
+        <table class="records-table">
+            <thead>
+                <tr>
+                    <th>时间</th>
+                    <th>用户ID</th>
+                    <th>格子号</th>
+                    <th>商品</th>
+                    <th>订单号</th>
+                    <th>状态</th>
+                </tr>
+            </thead>
+            <tbody id="recordsTableBody">
+                <!-- 动态加载 -->
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        const API_BASE = '';
+        
+        // 切换标签
+        function switchTab(tabName) {
+            // 更新按钮状态
+            document.querySelectorAll('.tab-button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // 更新内容区域
+            document.querySelectorAll('.section').forEach(section => {
+                section.classList.remove('active');
+            });
+            document.getElementById(tabName).classList.add('active');
+            
+            // 加载对应数据
+            if (tabName === 'dashboard') loadDashboard();
+            if (tabName === 'lockers') loadLockers();
+            if (tabName === 'config') loadConfig();
+            if (tabName === 'records') loadRecords();
+        }
+        
+        // 显示消息
+        function showMessage(elementId, message, isError = false) {
+            const el = document.getElementById(elementId);
+            el.textContent = message;
+            el.className = isError ? 'message message-error show' : 'message message-success show';
+            setTimeout(() => {
+                el.classList.remove('show');
+            }, 3000);
+        }
+        
+        // 加载仪表盘
+        async function loadDashboard() {
+            try {
+                const [statusRes, recordsRes] = await Promise.all([
+                    fetch(API_BASE + '/api/status'),
+                    fetch(API_BASE + '/api/admin/records')
+                ]);
+                
+                const status = await statusRes.json();
+                const records = await recordsRes.json();
+                
+                document.getElementById('statTotalDraws').textContent = records.records.length;
+                document.getElementById('statWinners').textContent = status.today_count || 0;
+                
+                // 获取可用格子数
+                const lockersRes = await fetch(API_BASE + '/api/admin/lockers');
+                const lockers = await lockersRes.json();
+                const available = lockers.lockers.filter(l => l.is_available === 1).length;
+                document.getElementById('statAvailableLockers').textContent = available;
+            } catch (err) {
+                console.error('加载仪表盘失败:', err);
+            }
+        }
+        
+        // 加载格子列表
+        async function loadLockers() {
+            try {
+                const res = await fetch(API_BASE + '/api/admin/lockers');
+                const data = await res.json();
+                
+                const listEl = document.getElementById('lockerList');
+                listEl.innerHTML = '';
+                
+                data.lockers.forEach(locker => {
+                    const div = document.createElement('div');
+                    div.className = 'locker-item' + (locker.is_available ? '' : ' unavailable');
+                    div.innerHTML = `
+                        <div class="locker-id">${locker.id}</div>
+                        <div class="locker-info">
+                            <input type="text" 
+                                   id="password-${locker.id}" 
+                                   value="${locker.password}" 
+                                   placeholder="格子密码">
+                            <input type="text" 
+                                   id="product-${locker.id}" 
+                                   value="${locker.product_name || ''}" 
+                                   placeholder="商品名称">
+                            <label style="font-size: 14px; margin-top: 5px; display: block;">
+                                <input type="checkbox" 
+                                       id="available-${locker.id}" 
+                                       ${locker.is_available ? 'checked' : ''}>
+                                可用状态
+                            </label>
+                        </div>
+                        <button onclick="updateLocker(${locker.id})">保存</button>
+                    `;
+                    listEl.appendChild(div);
+                });
+            } catch (err) {
+                console.error('加载格子列表失败:', err);
+            }
+        }
+        
+        // 更新格子信息
+        async function updateLocker(lockerId) {
+            const password = document.getElementById(`password-${lockerId}`).value;
+            const productName = document.getElementById(`product-${lockerId}`).value;
+            const isAvailable = document.getElementById(`available-${lockerId}`).checked ? 1 : 0;
+            
+            try {
+                const res = await fetch(API_BASE + `/api/admin/locker/${lockerId}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        password,
+                        product_name: productName,
+                        is_available: isAvailable
+                    })
+                });
+                
+                const data = await res.json();
+                if (data.success) {
+                    showMessage('message-lockers', '更新成功！');
+                } else {
+                    showMessage('message-lockers', '更新失败', true);
+                }
+            } catch (err) {
+                console.error('更新格子失败:', err);
+                showMessage('message-lockers', '更新失败', true);
+            }
+        }
+        
+        // 重置所有格子
+        async function resetAllLockers() {
+            if (!confirm('确定要重置所有格子为可用状态吗？')) return;
+            
+            try {
+                const res = await fetch(API_BASE + '/api/admin/reset_lockers', {
+                    method: 'POST'
+                });
+                const data = await res.json();
+                
+                if (data.success) {
+                    showMessage('message-lockers', '重置成功！');
+                    loadLockers();
+                } else {
+                    showMessage('message-lockers', '重置失败', true);
+                }
+            } catch (err) {
+                console.error('重置失败:', err);
+                showMessage('message-lockers', '重置失败', true);
+            }
+        }
+        
+        // 加载配置
+        async function loadConfig() {
+            try {
+                const res = await fetch(API_BASE + '/api/admin/config');
+                const data = await res.json();
+                
+                if (data.success) {
+                    document.getElementById('configDailyLimit').value = data.config.daily_limit;
+                    document.getElementById('configActivityStatus').value = data.config.activity_status;
+                }
+            } catch (err) {
+                console.error('加载配置失败:', err);
+            }
+        }
+        
+        // 保存配置
+        async function saveConfig() {
+            const dailyLimit = document.getElementById('configDailyLimit').value;
+            const activityStatus = document.getElementById('configActivityStatus').value;
+            
+            try {
+                const res = await fetch(API_BASE + '/api/admin/config', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        daily_limit: parseInt(dailyLimit),
+                        activity_status: activityStatus
+                    })
+                });
+                
+                const data = await res.json();
+                if (data.success) {
+                    showMessage('message-config', '配置保存成功！');
+                } else {
+                    showMessage('message-config', '保存失败', true);
+                }
+            } catch (err) {
+                console.error('保存配置失败:', err);
+                showMessage('message-config', '保存失败', true);
+            }
+        }
+        
+        // 加载抽奖记录
+        async function loadRecords() {
+            try {
+                const res = await fetch(API_BASE + '/api/admin/records');
+                const data = await res.json();
+                
+                const tbody = document.getElementById('recordsTableBody');
+                tbody.innerHTML = '';
+                
+                if (data.records.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: #999;">暂无记录</td></tr>';
+                    return;
+                }
+                
+                data.records.forEach(record => {
+                    const tr = document.createElement('tr');
+                    const time = new Date(record.draw_time).toLocaleTimeString('zh-CN');
+                    const userId = record.user_id.substring(0, 8) + '...';
+                    const lockerId = record.locker_id || '-';
+                    const productName = record.product_name || '-';
+                    const orderCode = record.order_code || '-';
+                    const status = record.locker_id 
+                        ? '<span class="badge badge-success">中奖</span>'
+                        : '<span class="badge badge-secondary">未中</span>';
+                    
+                    tr.innerHTML = `
+                        <td>${time}</td>
+                        <td>${userId}</td>
+                        <td>${lockerId}</td>
+                        <td>${productName}</td>
+                        <td>${orderCode}</td>
+                        <td>${status}</td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            } catch (err) {
+                console.error('加载记录失败:', err);
+            }
+        }
+        
+        // 页面加载时初始化
+        loadDashboard();
+    </script>
+</body>
+</html>
