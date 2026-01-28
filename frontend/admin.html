@@ -52,7 +52,7 @@
         
         .section {
             background: white;
-            padding: 20px;
+            padding: 15px;
             border-radius: 10px;
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
             margin-bottom: 20px;
@@ -65,9 +65,10 @@
         
         .section h2 {
             color: #333;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
             border-bottom: 2px solid #667eea;
-            padding-bottom: 10px;
+            padding-bottom: 8px;
+            font-size: 20px;
         }
         
         .stats-grid {
@@ -98,47 +99,83 @@
         
         .locker-list {
             display: grid;
-            gap: 15px;
+            gap: 8px;
         }
         
         .locker-item {
-            border: 2px solid #ddd;
-            border-radius: 10px;
-            padding: 15px;
-            display: grid;
-            grid-template-columns: auto 1fr auto;
-            gap: 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 10px 15px;
+            display: flex;
             align-items: center;
+            gap: 15px;
+            background: white;
         }
         
         .locker-item .locker-id {
-            font-size: 24px;
-            font-weight: bold;
+            font-size: 32px;
+            font-weight: 900;
             color: #667eea;
             width: 50px;
             text-align: center;
+            flex-shrink: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
         
         .locker-item .locker-info {
             flex: 1;
+            display: flex;
+            align-items: center;
+            gap: 15px;
         }
         
-        .locker-item input {
-            width: 100%;
-            padding: 8px;
-            margin: 5px 0;
+        .locker-field {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .locker-field label {
+            font-size: 15px;
+            font-weight: 600;
+            color: #333;
+            min-width: 70px;
+            flex-shrink: 0;
+        }
+        
+        .locker-field input[type="text"] {
+            width: 120px;
+            padding: 8px 10px;
             border: 1px solid #ddd;
             border-radius: 5px;
             font-size: 14px;
         }
         
+        .locker-checkbox {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            margin-left: auto;
+        }
+        
+        .locker-checkbox label {
+            font-size: 14px;
+            color: #666;
+        }
+        
         .locker-item button {
-            padding: 10px 20px;
+            padding: 8px 20px;
             background: #667eea;
             color: white;
             border: none;
             border-radius: 5px;
             cursor: pointer;
+            flex-shrink: 0;
+            font-size: 14px;
+            font-weight: 500;
         }
         
         .locker-item button:hover {
@@ -146,8 +183,21 @@
         }
         
         .locker-item.unavailable {
-            background: #f5f5f5;
-            opacity: 0.7;
+            background: #d6d6d6;
+            opacity: 1;
+        }
+        
+        .locker-item.unavailable .locker-id {
+            color: #999;
+            background: #999;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .locker-item.unavailable input {
+            background: #f0f0f0;
+            color: #666;
         }
         
         .config-form {
@@ -239,6 +289,11 @@
             background: #e2e3e5;
             color: #383d41;
         }
+
+        .badge-danger {
+            background: #f8d7da;
+            color: #721c24;
+        }
         
         .message {
             padding: 15px;
@@ -266,14 +321,17 @@
 </head>
 <body>
     <div class="header">
-        <h1>🎁 LuckyLocker 管理后台</h1>
+        <h1>🎁 LuckyLocker 管理后台 <span style="font-size: 14px; color: #999;">v0.1.0</span></h1>
         <p style="color: #666; margin-top: 5px;">管理格子柜、配置活动、查看记录</p>
         
         <div class="tabs">
             <button class="tab-button active" onclick="switchTab('dashboard')">仪表盘</button>
             <button class="tab-button" onclick="switchTab('lockers')">格子管理</button>
             <button class="tab-button" onclick="switchTab('config')">系统配置</button>
-            <button class="tab-button" onclick="switchTab('records')">抽奖记录</button>
+            <button class="tab-button" onclick="switchTab('greenlist')">绿通凭证</button>
+            <button class="tab-button" onclick="switchTab('products')">产品池</button>
+            <button class="tab-button" onclick="switchTab('qrcode')">客服二维码</button>
+            <button class="tab-button" onclick="switchTab('lottery')">抽奖设置</button>
         </div>
     </div>
 
@@ -299,9 +357,6 @@
     <!-- 格子管理 -->
     <div class="section" id="lockers">
         <h2>🗄️ 格子柜管理</h2>
-        <button class="btn-secondary" onclick="resetAllLockers()" style="margin-bottom: 20px;">
-            重置所有格子为可用
-        </button>
         <div id="message-lockers" class="message"></div>
         <div class="locker-list" id="lockerList">
             <!-- 动态加载 -->
@@ -334,18 +389,162 @@
         </div>
     </div>
 
-    <!-- 抽奖记录 -->
-    <div class="section" id="records">
-        <h2>📋 今日抽奖记录</h2>
+    <!-- 绿通凭证管理 -->
+    <div class="section" id="greenlist">
+        <h2>🎫 绿通凭证管理</h2>
+        <div id="message-greenlist" class="message"></div>
+        
+        <div style="background: #f8f9fa; padding: 15px; border-radius: 5px; margin-bottom: 20px;">
+            <h3 style="margin-bottom: 10px;">添加新凭证</h3>
+            <div class="form-group">
+                <label>凭证标识（手机号/订单号/自定义码）</label>
+                <input type="text" id="newGreenIdentifier" placeholder="例如: 13800138000">
+            </div>
+            <div class="form-group">
+                <label>凭证类型</label>
+                <select id="newGreenType">
+                    <option value="phone">手机号</option>
+                    <option value="order">订单号</option>
+                    <option value="custom">自定义</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>剩余抽奖次数</label>
+                <input type="number" id="newGreenDraws" value="1" min="1" max="10">
+            </div>
+            <div class="form-group">
+                <label>有效期（小时）</label>
+                <input type="number" id="newGreenExpires" value="24" min="1" max="720">
+            </div>
+            <button class="btn-primary" onclick="addGreenCode()">添加凭证</button>
+        </div>
+        
+        <h3 style="margin: 20px 0;">现有凭证列表</h3>
         <table class="records-table">
             <thead>
                 <tr>
-                    <th>时间</th>
-                    <th>用户ID</th>
-                    <th>格子号</th>
-                    <th>商品</th>
-                    <th>订单号</th>
+                    <th>ID</th>
+                    <th>凭证标识</th>
+                    <th>类型</th>
+                    <th>剩余次数</th>
+                    <th>创建时间</th>
+                    <th>过期时间</th>
                     <th>状态</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+            <tbody id="greenlistTableBody">
+                <!-- 动态加载 -->
+            </tbody>
+        </table>
+    </div>
+
+    <!-- 客服二维码管理 -->
+    <div class="section" id="qrcode">
+        <h2>📱 客服二维码管理</h2>
+        <p style="color: #666; margin-bottom: 15px;">上传客服二维码，显示在前端抽奖页面供用户联系客服</p>
+        <div id="message-qrcode" class="message"></div>
+        
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+            <div style="background: #f8f9fa; padding: 20px; border-radius: 10px;">
+                <h3 style="margin-bottom: 15px;">当前二维码预览</h3>
+                <div style="display: flex; justify-content: center; align-items: center; min-height: 250px; background: white; border: 2px dashed #ddd; border-radius: 10px;">
+                    <img id="currentQrcode" src="/api/qrcode" alt="客服二维码" style="max-width: 100%; max-height: 250px; display: block;">
+                </div>
+                <p style="text-align: center; margin-top: 10px; font-size: 14px; color: #666;" id="qrcodeStatus">加载中...</p>
+            </div>
+            
+            <div style="background: #f8f9fa; padding: 20px; border-radius: 10px;">
+                <h3 style="margin-bottom: 15px;">上传新二维码</h3>
+                <div style="border: 2px dashed #667eea; border-radius: 10px; padding: 30px; text-align: center; background: white;">
+                    <input type="file" id="qrcodeFile" accept="image/*" style="display: none;" onchange="previewQrcode(this)">
+                    <div id="qrcodePreview" style="margin-bottom: 15px; min-height: 150px; display: flex; align-items: center; justify-content: center;">
+                        <p style="color: #999;">点击下方按钮选择图片</p>
+                    </div>
+                    <button class="btn-primary" onclick="document.getElementById('qrcodeFile').click()">选择图片</button>
+                    <button class="btn-primary" onclick="uploadQrcode()" style="margin-left: 10px;">上传</button>
+                </div>
+                <p style="margin-top: 10px; font-size: 12px; color: #999;">支持 PNG、JPG、GIF 格式</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 产品池管理 -->
+    <div class="section" id="products">
+        <h2>🎁 预设产品池管理</h2>
+        <p style="color: #666; margin-bottom: 15px;">滚动显示的产品名称从这里随机选择，不一定对应格子柜实际商品</p>
+        <div id="message-products" class="message"></div>
+        
+        <div style="background: #f8f9fa; padding: 15px; border-radius: 5px; margin-bottom: 20px;">
+            <h3 style="margin-bottom: 10px;">添加新产品</h3>
+            <div style="display: flex; gap: 10px; align-items: flex-end;">
+                <div class="form-group" style="flex: 1; margin-bottom: 0;">
+                    <input type="text" id="newProductName" placeholder="输入产品名称">
+                </div>
+                <button class="btn-primary" onclick="addProduct()">添加</button>
+            </div>
+        </div>
+        
+        <h3 style="margin: 20px 0;">产品列表</h3>
+        <table class="records-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>产品名称</th>
+                    <th>状态</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+            <tbody id="productsTableBody">
+                <!-- 动态加载 -->
+            </tbody>
+        </table>
+    </div>
+
+    <!-- 抽奖设置 -->
+    <div class="section" id="lottery">
+        <h2>🎯 抽奖设置</h2>
+        <div id="message-lottery" class="message"></div>
+        
+        <!-- 模拟中奖次数配置 -->
+        <div style="background: #fff3cd; border: 2px solid #ffc107; padding: 15px; border-radius: 5px; margin-bottom: 20px;">
+            <h3 style="margin-bottom: 15px; color: #856404;">📊 模拟中奖次数设置</h3>
+            <div class="form-group">
+                <label>每天模拟显示的中奖人数（设置为0表示不模拟，仅显示真实数据）</label>
+                <input type="number" id="mockWinnersInput" min="0" max="50" value="0" style="width: 150px; padding: 8px; border: 2px solid #ddd; border-radius: 5px;">
+                <button class="btn-primary" onclick="saveMockWinners()" style="margin-left: 10px;">保存</button>
+            </div>
+            <p style="color: #856404; font-size: 13px; margin-top: 10px; margin-bottom: 0;">
+                • 设默认置为<strong>0</strong>时，仅显示真实中奖数;  >0时，表示初始化模拟中奖人数 (此数不宜设大，否则会导致抽奖前几个，中奖数据无变化)<br>
+                • 每天0点重置，自动加载模拟数据，并随机生成模拟产品;  已显示的中奖产品，当天不会变化
+            </p>
+        </div>
+        
+        <!-- 抽奖记录 -->
+        <h3 style="margin: 20px 0 15px 0;">📋 抽奖记录</h3>
+        <div style="background: #f8f9fa; padding: 15px; border-radius: 5px; margin-bottom: 20px;">
+            <div style="display: flex; gap: 15px; align-items: flex-end;">
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label>选择日期</label>
+                    <input type="date" id="recordDateFilter" style="padding: 8px; border: 2px solid #ddd; border-radius: 5px;">
+                </div>
+                <button class="btn-primary" onclick="filterRecordsByDate()">筛选</button>
+                <button class="btn-secondary" onclick="loadRecords()">显示今日</button>
+                <button class="btn-secondary" onclick="loadAllRecords()">显示全部</button>
+            </div>
+            <p style="color: #666; font-size: 12px; margin-top: 10px; margin-bottom: 0;">
+                当前显示：<span id="recordDateDisplay" style="font-weight: bold; color: #667eea;">今日记录</span>
+            </p>
+        </div>
+        
+        <table class="records-table">
+            <thead>
+                <tr>
+                    <th style="text-align: center; width: 80px;">状态</th>
+                    <th>中奖时间</th>
+                    <th style="text-align: center;">开锁密码</th>
+                    <th>商品名</th>
+                    <th style="min-width: 200px;">用户ID</th>
                 </tr>
             </thead>
             <tbody id="recordsTableBody">
@@ -375,7 +574,10 @@
             if (tabName === 'dashboard') loadDashboard();
             if (tabName === 'lockers') loadLockers();
             if (tabName === 'config') loadConfig();
-            if (tabName === 'records') loadRecords();
+            if (tabName === 'greenlist') loadGreenlist();
+            if (tabName === 'products') loadProducts();
+            if (tabName === 'qrcode') loadQrcodeStatus();
+            if (tabName === 'lottery') loadLotterySettings();
         }
         
         // 显示消息
@@ -427,20 +629,26 @@
                     div.innerHTML = `
                         <div class="locker-id">${locker.id}</div>
                         <div class="locker-info">
-                            <input type="text" 
-                                   id="password-${locker.id}" 
-                                   value="${locker.password}" 
-                                   placeholder="格子密码">
-                            <input type="text" 
-                                   id="product-${locker.id}" 
-                                   value="${locker.product_name || ''}" 
-                                   placeholder="商品名称">
-                            <label style="font-size: 14px; margin-top: 5px; display: block;">
+                            <div class="locker-field">
+                                <label>开锁密码</label>
+                                <input type="text" 
+                                       id="password-${locker.id}" 
+                                       value="${locker.password}" 
+                                       placeholder="001">
+                            </div>
+                            <div class="locker-field">
+                                <label>商品名称</label>
+                                <input type="text" 
+                                       id="product-${locker.id}" 
+                                       value="${locker.product_name || ''}" 
+                                       placeholder="商品${locker.id}">
+                            </div>
+                            <div class="locker-checkbox">
                                 <input type="checkbox" 
                                        id="available-${locker.id}" 
                                        ${locker.is_available ? 'checked' : ''}>
-                                可用状态
-                            </label>
+                                <label>可用状态</label>
+                            </div>
                         </div>
                         <button onclick="updateLocker(${locker.id})">保存</button>
                     `;
@@ -471,6 +679,8 @@
                 const data = await res.json();
                 if (data.success) {
                     showMessage('message-lockers', '更新成功！');
+                    // 自动刷新格子列表以更新背景色
+                    setTimeout(() => loadLockers(), 500);
                 } else {
                     showMessage('message-lockers', '更新失败', true);
                 }
@@ -480,25 +690,234 @@
             }
         }
         
-        // 重置所有格子
-        async function resetAllLockers() {
-            if (!confirm('确定要重置所有格子为可用状态吗？')) return;
+        // 加载绿通凭证列表
+        async function loadGreenlist() {
+            try {
+                const res = await fetch(API_BASE + '/api/admin/greenlist');
+                const data = await res.json();
+                
+                const tbody = document.getElementById('greenlistTableBody');
+                tbody.innerHTML = '';
+                
+                if (data.records.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; color: #999;">暂无凭证</td></tr>';
+                    return;
+                }
+                
+                data.records.forEach(record => {
+                    const tr = document.createElement('tr');
+                    const createdTime = new Date(record.created_at).toLocaleString('zh-CN');
+                    const expiresTime = record.expires_at ? new Date(record.expires_at).toLocaleString('zh-CN') : '永久';
+                    let statusBadge = '<span class="badge badge-success">可用</span>';
+                    if (record.status === '已过期') {
+                        statusBadge = '<span class="badge badge-danger">已过期</span>';
+                    } else if (record.status === '已用完') {
+                        statusBadge = '<span class="badge badge-secondary">已用完</span>';
+                    }
+                    
+                    tr.innerHTML = `
+                        <td>${record.id}</td>
+                        <td>${record.identifier}</td>
+                        <td>${record.type}</td>
+                        <td>${record.remaining_draws}</td>
+                        <td>${createdTime}</td>
+                        <td>${expiresTime}</td>
+                        <td>${statusBadge}</td>
+                        <td>
+                            <button onclick="deleteGreenCode(${record.id})" 
+                                    style="padding: 5px 10px; background: #dc3545; color: white; border: none; border-radius: 3px; cursor: pointer;">
+                                删除
+                            </button>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            } catch (err) {
+                console.error('加载绿通凭证失败:', err);
+            }
+        }
+        
+        // 添加绿通凭证
+        async function addGreenCode() {
+            const identifier = document.getElementById('newGreenIdentifier').value.trim();
+            const type = document.getElementById('newGreenType').value;
+            const draws = parseInt(document.getElementById('newGreenDraws').value);
+            const expires = parseInt(document.getElementById('newGreenExpires').value);
+            
+            if (!identifier) {
+                showMessage('message-greenlist', '请输入凭证标识', true);
+                return;
+            }
             
             try {
-                const res = await fetch(API_BASE + '/api/admin/reset_lockers', {
-                    method: 'POST'
+                const res = await fetch(API_BASE + '/api/admin/greenlist', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        identifier,
+                        type,
+                        remaining_draws: draws,
+                        expires_hours: expires
+                    })
+                });
+                
+                if (!res.ok) {
+                    throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+                }
+                
+                const data = await res.json();
+                
+                if (data.success) {
+                    showMessage('message-greenlist', '凭证添加成功！');
+                    document.getElementById('newGreenIdentifier').value = '';
+                    loadGreenlist();
+                } else {
+                    showMessage('message-greenlist', data.message || '添加失败', true);
+                }
+            } catch (err) {
+                console.error('添加凭证失败:', err);
+                showMessage('message-greenlist', `添加失败：${err.message}`, true);
+            }
+        }
+        
+        // 删除绿通凭证
+        async function deleteGreenCode(id) {
+            if (!confirm('确定要删除这个凭证吗？')) return;
+            
+            try {
+                const res = await fetch(API_BASE + `/api/admin/greenlist/${id}`, {
+                    method: 'DELETE'
                 });
                 const data = await res.json();
                 
                 if (data.success) {
-                    showMessage('message-lockers', '重置成功！');
-                    loadLockers();
+                    showMessage('message-greenlist', '删除成功！');
+                    loadGreenlist();
                 } else {
-                    showMessage('message-lockers', '重置失败', true);
+                    showMessage('message-greenlist', '删除失败', true);
                 }
             } catch (err) {
-                console.error('重置失败:', err);
-                showMessage('message-lockers', '重置失败', true);
+                console.error('删除失败:', err);
+                showMessage('message-greenlist', '删除失败', true);
+            }
+        }
+        
+        // 加载产品池
+        async function loadProducts() {
+            try {
+                const res = await fetch(API_BASE + '/api/admin/product_pool');
+                const data = await res.json();
+                
+                const tbody = document.getElementById('productsTableBody');
+                tbody.innerHTML = '';
+                
+                if (data.products.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="4" style="text-align: center; color: #999;">暂无产品</td></tr>';
+                    return;
+                }
+                
+                data.products.forEach(product => {
+                    const tr = document.createElement('tr');
+                    const statusBadge = product.is_active 
+                        ? '<span class="badge badge-success">启用</span>'
+                        : '<span class="badge badge-secondary">禁用</span>';
+                    
+                    tr.innerHTML = `
+                        <td>${product.id}</td>
+                        <td>${product.product_name}</td>
+                        <td>${statusBadge}</td>
+                        <td>
+                            <button onclick="toggleProduct(${product.id}, ${product.is_active})" 
+                                    style="padding: 5px 10px; background: #667eea; color: white; border: none; border-radius: 3px; cursor: pointer; margin-right: 5px;">
+                                ${product.is_active ? '禁用' : '启用'}
+                            </button>
+                            <button onclick="deleteProduct(${product.id})" 
+                                    style="padding: 5px 10px; background: #dc3545; color: white; border: none; border-radius: 3px; cursor: pointer;">
+                                删除
+                            </button>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            } catch (err) {
+                console.error('加载产品池失败:', err);
+            }
+        }
+        
+        // 添加产品
+        async function addProduct() {
+            const productName = document.getElementById('newProductName').value.trim();
+            
+            if (!productName) {
+                showMessage('message-products', '请输入产品名称', true);
+                return;
+            }
+            
+            try {
+                const res = await fetch(API_BASE + '/api/admin/product_pool', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ product_name: productName })
+                });
+                const data = await res.json();
+                
+                if (data.success) {
+                    showMessage('message-products', '产品添加成功！');
+                    document.getElementById('newProductName').value = '';
+                    loadProducts();
+                } else {
+                    showMessage('message-products', data.message, true);
+                }
+            } catch (err) {
+                console.error('添加产品失败:', err);
+                showMessage('message-products', '添加失败', true);
+            }
+        }
+        
+        // 切换产品状态
+        async function toggleProduct(id, currentStatus) {
+            try {
+                const res = await fetch(API_BASE + `/api/admin/product_pool/${id}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        is_active: currentStatus ? 0 : 1,
+                        product_name: '' // 后端会忽略空字符串
+                    })
+                });
+                const data = await res.json();
+                
+                if (data.success) {
+                    showMessage('message-products', '状态更新成功！');
+                    loadProducts();
+                } else {
+                    showMessage('message-products', '更新失败', true);
+                }
+            } catch (err) {
+                console.error('更新失败:', err);
+                showMessage('message-products', '更新失败', true);
+            }
+        }
+        
+        // 删除产品
+        async function deleteProduct(id) {
+            if (!confirm('确定要删除这个产品吗？')) return;
+            
+            try {
+                const res = await fetch(API_BASE + `/api/admin/product_pool/${id}`, {
+                    method: 'DELETE'
+                });
+                const data = await res.json();
+                
+                if (data.success) {
+                    showMessage('message-products', '删除成功！');
+                    loadProducts();
+                } else {
+                    showMessage('message-products', '删除失败', true);
+                }
+            } catch (err) {
+                console.error('删除失败:', err);
+                showMessage('message-products', '删除失败', true);
             }
         }
         
@@ -544,14 +963,29 @@
             }
         }
         
-        // 加载抽奖记录
-        async function loadRecords() {
+        // 加载抽奖记录（支持日期筛选）
+        async function loadRecords(dateFilter = '', showAll = false) {
             try {
-                const res = await fetch(API_BASE + '/api/admin/records');
+                let url = API_BASE + '/api/admin/records';
+                if (showAll) {
+                    url += '?all=true';
+                } else if (dateFilter) {
+                    url += `?date=${dateFilter}`;
+                }
+                
+                const res = await fetch(url);
                 const data = await res.json();
                 
                 const tbody = document.getElementById('recordsTableBody');
                 tbody.innerHTML = '';
+                
+                // 更新显示标签
+                const displayLabel = document.getElementById('recordDateDisplay');
+                if (data.filter) {
+                    displayLabel.textContent = data.filter === '全部' ? '全部记录' : 
+                                              data.filter === '今日' ? '今日记录' : 
+                                              `${data.filter} 的记录`;
+                }
                 
                 if (data.records.length === 0) {
                     tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: #999;">暂无记录</td></tr>';
@@ -560,27 +994,187 @@
                 
                 data.records.forEach(record => {
                     const tr = document.createElement('tr');
-                    const time = new Date(record.draw_time).toLocaleTimeString('zh-CN');
-                    const userId = record.user_id.substring(0, 8) + '...';
-                    const lockerId = record.locker_id || '-';
+                    const drawTime = new Date(record.draw_time);
+                    const time = drawTime.toLocaleString('zh-CN', { 
+                        month: '2-digit', 
+                        day: '2-digit', 
+                        hour: '2-digit', 
+                        minute: '2-digit', 
+                        second: '2-digit' 
+                    });
+                    // 显示完整用户ID，使用小字体和代码样式
+                    const userId = `<code style="font-size: 10px; background: #f4f4f4; padding: 2px 6px; border-radius: 3px; color: #999;">${record.user_id}</code>`;
                     const productName = record.product_name || '-';
                     const orderCode = record.order_code || '-';
                     const status = record.locker_id 
                         ? '<span class="badge badge-success">中奖</span>'
                         : '<span class="badge badge-secondary">未中</span>';
                     
+                    // 新顺序：状态 → 时间 → 开锁密码 → 商品名 → 用户ID
                     tr.innerHTML = `
+                        <td style="text-align: center;">${status}</td>
                         <td>${time}</td>
-                        <td>${userId}</td>
-                        <td>${lockerId}</td>
+                        <td style="text-align: center; font-family: monospace; font-weight: bold; font-size: 16px; color: #667eea;">${orderCode}</td>
                         <td>${productName}</td>
-                        <td>${orderCode}</td>
-                        <td>${status}</td>
+                        <td>${userId}</td>
                     `;
                     tbody.appendChild(tr);
                 });
             } catch (err) {
                 console.error('加载记录失败:', err);
+            }
+        }
+        
+        // 按日期筛选记录
+        function filterRecordsByDate() {
+            const dateInput = document.getElementById('recordDateFilter');
+            const dateValue = dateInput.value;
+            
+            if (!dateValue) {
+                alert('请选择日期');
+                return;
+            }
+            
+            loadRecords(dateValue, false);
+        }
+        
+        // 加载所有记录
+        function loadAllRecords() {
+            document.getElementById('recordDateFilter').value = '';
+            loadRecords('', true);
+        }
+        
+        // 加载二维码状态
+        async function loadQrcodeStatus() {
+            try {
+                const res = await fetch(API_BASE + '/api/admin/qrcode_status');
+                const data = await res.json();
+                
+                const statusEl = document.getElementById('qrcodeStatus');
+                const qrcodeImg = document.getElementById('currentQrcode');
+                
+                if (data.has_custom) {
+                    statusEl.textContent = '当前使用：自定义上传的二维码';
+                    statusEl.style.color = '#28a745';
+                } else if (data.has_default) {
+                    statusEl.textContent = '当前使用：系统默认二维码';
+                    statusEl.style.color = '#666';
+                } else {
+                    statusEl.textContent = '尚未设置二维码';
+                    statusEl.style.color = '#dc3545';
+                }
+                
+                // 强制刷新二维码预览（添加时间戳避免缓存）
+                qrcodeImg.src = '/api/qrcode?t=' + new Date().getTime();
+                
+                // 处理图片加载错误
+                qrcodeImg.onerror = function() {
+                    this.style.display = 'none';
+                    this.parentElement.innerHTML = '<p style="color: #999; padding: 20px;">暂无二维码</p>';
+                };
+                
+                qrcodeImg.onload = function() {
+                    this.style.display = 'block';
+                };
+            } catch (err) {
+                console.error('加载二维码状态失败:', err);
+            }
+        }
+        
+        // 预览二维码
+        function previewQrcode(input) {
+            const previewDiv = document.getElementById('qrcodePreview');
+            
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                
+                reader.onload = function(e) {
+                    previewDiv.innerHTML = `<img src="${e.target.result}" style="max-width: 100%; max-height: 150px;">`;
+                };
+                
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+        
+        // 上传二维码
+        async function uploadQrcode() {
+            const fileInput = document.getElementById('qrcodeFile');
+            
+            if (!fileInput.files || !fileInput.files[0]) {
+                showMessage('message-qrcode', '请先选择图片', true);
+                return;
+            }
+            
+            const formData = new FormData();
+            formData.append('file', fileInput.files[0]);
+            
+            try {
+                const res = await fetch(API_BASE + '/api/admin/upload_qrcode', {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await res.json();
+                
+                if (data.success) {
+                    showMessage('message-qrcode', '上传成功！');
+                    
+                    // 强制刷新二维码预览（添加时间戳避免缓存）
+                    setTimeout(() => {
+                        const timestamp = new Date().getTime();
+                        document.getElementById('currentQrcode').src = '/api/qrcode?t=' + timestamp;
+                        loadQrcodeStatus();
+                    }, 500);
+                    
+                    // 清空预览
+                    document.getElementById('qrcodePreview').innerHTML = '<p style="color: #999;">点击下方按钮选择图片</p>';
+                    fileInput.value = '';
+                } else {
+                    showMessage('message-qrcode', data.message, true);
+                }
+            } catch (err) {
+                console.error('上传失败:', err);
+                showMessage('message-qrcode', '上传失败', true);
+            }
+        }
+        
+        // 加载抽奖设置
+        async function loadLotterySettings() {
+            // 加载模拟中奖次数配置
+            try {
+                const res = await fetch(API_BASE + '/api/admin/config');
+                const data = await res.json();
+                
+                if (data.success && data.config.mock_winners !== undefined) {
+                    document.getElementById('mockWinnersInput').value = data.config.mock_winners || '0';
+                }
+            } catch (err) {
+                console.error('加载配置失败:', err);
+            }
+            
+            // 加载抽奖记录
+            loadRecords();
+        }
+        
+        // 保存模拟中奖次数
+        async function saveMockWinners() {
+            const mockWinners = document.getElementById('mockWinnersInput').value;
+            
+            try {
+                const res = await fetch(API_BASE + '/api/admin/config', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ mock_winners: parseInt(mockWinners) })
+                });
+                
+                const data = await res.json();
+                if (data.success) {
+                    showMessage('message-lottery', '配置保存成功！页面将自动刷新模拟数据。');
+                } else {
+                    showMessage('message-lottery', '保存失败', true);
+                }
+            } catch (err) {
+                console.error('保存失败:', err);
+                showMessage('message-lottery', '保存失败', true);
             }
         }
         
