@@ -17,10 +17,11 @@ app = Flask(__name__, static_folder='../frontend')
 CORS(app)  # 允许跨域访问
 
 VERSION = '0.1.0'
-DB_PATH = 'luckylocker.db'
 
 # 使用绝对路径确保文件能被找到
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+# 数据库路径：放在backend目录的上一级（项目根目录）
+DB_PATH = os.path.join(os.path.dirname(BASE_DIR), 'luckylocker.db')
 UPLOAD_FOLDER = os.path.join(BASE_DIR, 'uploads')
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 
@@ -135,6 +136,11 @@ def init_db():
     
     conn.commit()
     conn.close()
+
+# 自动初始化数据库（确保在gunicorn启动时也会执行）
+print("🔧 正在初始化数据库...")
+init_db()
+print("✅ 数据库初始化完成")
 
 # ==================== 工具函数 ====================
 def get_db():
