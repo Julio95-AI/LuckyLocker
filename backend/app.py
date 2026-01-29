@@ -892,11 +892,17 @@ def get_qrcode_status():
 if __name__ == '__main__':
     # 初始化数据库
     init_db()
+    
+    # 支持环境变量配置（适配Render等云平台）
+    port = int(os.environ.get('PORT', 5000))
+    debug = os.environ.get('DEBUG', 'False').lower() == 'true'
+    
     print("=" * 50)
     print(f"LuckyLocker 抽奖系统启动 (v{VERSION})")
-    print("前端访问: http://localhost:5000")
-    print("管理后台: http://localhost:5000/admin.html")
+    print(f"运行模式: {'开发模式' if debug else '生产模式'}")
+    print(f"前端访问: http://localhost:{port}")
+    print(f"管理后台: http://localhost:{port}/admin.html")
     print("=" * 50)
     
     # 启动Flask服务
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    app.run(host='0.0.0.0', port=port, debug=debug)

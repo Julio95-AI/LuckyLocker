@@ -1,5 +1,63 @@
 # 更新日志
 
+## [0.2.0] - 2026-01-29
+
+### 🚀 部署相关
+
+#### 新增完整部署文档体系
+- ✨ **[快速部署指南](docs/deployment/QUICKSTART.md)**：5步完成部署，20分钟上线公网
+- ✨ **[方案全对比](docs/deployment/DEPLOYMENT_COMPARISON.md)**：按预算/流量/技术水平选择最佳方案
+- ✨ **[完整部署指南](docs/deployment/DEPLOY_PUBLIC.md)**：涵盖Render、Railway、Cloudflare Tunnel等6种方案
+- ✨ **[部署检查清单](docs/deployment/DEPLOYMENT_CHECKLIST.md)**：可视化部署步骤，逐项打勾完成
+- ✨ **[部署指南索引](docs/deployment/DEPLOY_GUIDE.md)**：文档导航，不知道看哪个？从这里开始
+
+#### 云平台部署支持
+- ✨ **Render平台配置**：新增 `render.yaml` 自动部署配置
+- ✨ **环境变量支持**：`backend/app.py` 支持 PORT 和 DEBUG 环境变量，适配各云平台
+- ✨ **Gunicorn生产服务器**：`requirements.txt` 新增 gunicorn 依赖
+
+#### 工具脚本
+- ✨ **Cloudflare Worker防休眠脚本**：`scripts/cloudflare-worker-keepalive.js`
+- ✨ **项目清理脚本**：`scripts/cleanup.sh` 和 `scripts/cleanup.bat`
+
+### 📁 项目结构优化
+
+#### 新增文件夹
+- ✅ `docs/` - 统一管理项目文档
+- ✅ `docs/deployment/` - 部署相关文档
+- ✅ `scripts/` - 工具脚本
+
+#### 文件整理
+- 📂 所有部署文档移至 `docs/deployment/`
+- 📂 所有脚本移至 `scripts/`
+- 📄 中文文件名改为英文（避免Git跨平台问题）
+- 📄 新增 `.gitignore` 防止数据库文件误提交
+
+#### 文档更新
+- 📝 `README.md` 更新部署章节，添加文档链接
+- 📝 新增 `docs/STRUCTURE.md` 说明项目结构
+- 📝 新增 `docs/WECHAT_MINIPROGRAM_DESIGN.md` 微信小程序设计文档
+
+### 🎯 部署方案概览
+
+| 方案 | 费用 | 难度 | 推荐场景 |
+|------|------|------|----------|
+| Render免费版 | ¥0 | ⭐ 极简单 | 测试/小流量 |
+| Railway | ¥35/月 | ⭐⭐ 简单 | 中流量活动 |
+| 云服务器 | ¥70+/月 | ⭐⭐⭐⭐ 复杂 | 正式商用 |
+
+### 💡 推荐新手方案
+
+**Render（免费） + Cloudflare**
+- ✅ 完全免费
+- ✅ 5分钟部署
+- ✅ 自动HTTPS
+- ✅ 适合测试和小流量活动
+
+查看 [docs/deployment/QUICKSTART.md](docs/deployment/QUICKSTART.md) 开始部署！
+
+---
+
 ## [0.1.0] - 2026-01-22
 
 ### 新增功能

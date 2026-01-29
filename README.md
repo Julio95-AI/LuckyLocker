@@ -126,17 +126,28 @@ LuckyLocker 抽奖系统启动
 建议密码格式：`001`, `002`, `003` ... `008`
 实际开锁密码会显示为：`格子号-密码`，例如 `2-038` 表示2号格子，密码038
 
-## 🌐 部署到服务器
+## 🌐 部署到公网
+
+### 🚀 快速部署（推荐新手）
+
+**5分钟免费部署到公网** → 查看 **[docs/deployment/QUICKSTART.md](docs/deployment/QUICKSTART.md)**
+
+使用 Render（免费） + Cloudflare，无需购买服务器，适合测试和小流量活动。
+
+### 📚 完整部署方案
+
+- 📖 **[部署指南索引](docs/deployment/DEPLOY_GUIDE.md)** - 不知道看哪个文档？从这里开始
+- 📖 **[快速入门](docs/deployment/QUICKSTART.md)** - 5步完成部署（推荐新手）
+- 📖 **[方案对比](docs/deployment/DEPLOYMENT_COMPARISON.md)** - 按预算/流量/技术水平选择方案
+- 📖 **[完整指南](docs/deployment/DEPLOY_PUBLIC.md)** - 所有部署方案详解
+- 📖 **[检查清单](docs/deployment/DEPLOYMENT_CHECKLIST.md)** - 可视化部署步骤
+- 📖 **[传统部署](docs/deployment/DEPLOY.md)** - 使用自己的服务器
 
 ### 方案1：直接部署（适合小规模使用）
 
 1. 将整个项目上传到服务器
 2. 安装依赖：`pip install -r requirements.txt`
-3. 修改 `app.py` 最后一行，改为生产模式：
-   ```python
-   app.run(host='0.0.0.0', port=5000, debug=False)
-   ```
-4. 启动服务：`python app.py`
+3. 启动服务：`python backend/app.py`（已支持环境变量配置）
 
 ### 方案2：使用 Nginx + Gunicorn（推荐生产环境）
 
