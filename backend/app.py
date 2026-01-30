@@ -202,17 +202,37 @@ def set_system_config(key, value):
     conn.commit()
     conn.close()
 
-# ==================== API接口 ====================
+# ==================== 路由配置 ====================
 
+# 根路径 - 应用门户
 @app.route('/')
-def index():
-    """首页"""
-    resp = send_from_directory(app.static_folder, 'index.html')
-    # 禁用缓存，避免一直看到旧页面
+def portal():
+    """应用门户首页"""
+    resp = send_from_directory(app.static_folder, 'portal.html')
     resp.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate, max-age=0'
     resp.headers['Pragma'] = 'no-cache'
     return resp
 
+# LuckyLocker 应用首页
+@app.route('/luckylocker/')
+@app.route('/luckylocker/index.html')
+def luckylocker_index():
+    """LuckyLocker 抽奖页面"""
+    resp = send_from_directory(app.static_folder, 'luckylocker/index.html')
+    resp.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate, max-age=0'
+    resp.headers['Pragma'] = 'no-cache'
+    return resp
+
+# LuckyLocker 管理后台
+@app.route('/luckylocker/admin.html')
+def luckylocker_admin():
+    """LuckyLocker 管理后台"""
+    resp = send_from_directory(app.static_folder, 'luckylocker/admin.html')
+    resp.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate, max-age=0'
+    resp.headers['Pragma'] = 'no-cache'
+    return resp
+
+# 静态文件服务（通用）
 @app.route('/<path:path>')
 def static_files(path):
     """静态文件"""
@@ -223,7 +243,9 @@ def static_files(path):
         resp.headers['Pragma'] = 'no-cache'
     return resp
 
-@app.route('/api/draw', methods=['POST'])
+# ==================== LuckyLocker API接口 ====================
+
+@app.route('/luckylocker/api/draw', methods=['POST'])
 def draw():
     """抽奖接口（支持绿通凭证）"""
     data = request.json or {}
@@ -331,7 +353,7 @@ def draw():
         'message': f'恭喜中奖！您的开锁密码：{order_code}'
     })
 
-@app.route('/api/status', methods=['GET'])
+@app.route('/luckylocker/api/status', methods=['GET'])
 def status():
     """获取系统状态（支持模拟数据）"""
     import json
@@ -406,7 +428,7 @@ def status():
         'won_products': won_products_display
     })
 
-@app.route('/api/check_draw_status', methods=['POST'])
+@app.route('/luckylocker/api/check_draw_status', methods=['POST'])
 def check_draw_status():
     """检查用户是否可以抽奖"""
     user_id = generate_user_id(request)
@@ -481,7 +503,7 @@ def check_draw_status():
         'reason': 'ok'
     })
 
-@app.route('/api/verify_order', methods=['POST'])
+@app.route('/luckylocker/api/verify_order', methods=['POST'])
 def verify_order():
     """验证订单号（供管理员核销使用）"""
     data = request.json
@@ -512,7 +534,7 @@ def verify_order():
 
 # ==================== 管理后台API ====================
 
-@app.route('/api/admin/lockers', methods=['GET'])
+@app.route('/luckylocker/api/admin/lockers', methods=['GET'])
 def get_lockers():
     """获取所有格子信息"""
     conn = get_db()
@@ -522,7 +544,7 @@ def get_lockers():
     conn.close()
     return jsonify({'success': True, 'lockers': lockers})
 
-@app.route('/api/admin/locker/<int:locker_id>', methods=['PUT'])
+@app.route('/luckylocker/api/admin/locker/<int:locker_id>', methods=['PUT'])
 def update_locker(locker_id):
     """更新格子信息"""
     data = request.json
@@ -539,7 +561,7 @@ def update_locker(locker_id):
     
     return jsonify({'success': True, 'message': '更新成功'})
 
-@app.route('/api/admin/config', methods=['GET', 'POST'])
+@app.route('/luckylocker/api/admin/config', methods=['GET', 'POST'])
 def manage_config():
     """管理系统配置"""
     if request.method == 'GET':
@@ -576,7 +598,7 @@ def manage_config():
         conn.close()
         return jsonify({'success': True, 'message': '配置更新成功'})
 
-@app.route('/api/admin/records', methods=['GET'])
+@app.route('/luckylocker/api/admin/records', methods=['GET'])
 def get_records():
     """获取抽奖记录（支持日期筛选）"""
     conn = get_db()
@@ -625,7 +647,7 @@ def get_records():
     
     return jsonify({'success': True, 'records': records, 'filter': date_filter or ('全部' if show_all else '今日')})
 
-@app.route('/api/admin/reset_lockers', methods=['POST'])
+@app.route('/luckylocker/api/admin/reset_lockers', methods=['POST'])
 def reset_lockers():
     """重置所有格子为可用状态（放置新货品时使用）"""
     conn = get_db()
@@ -637,7 +659,7 @@ def reset_lockers():
 
 # ==================== 绿通凭证管理API ====================
 
-@app.route('/api/admin/greenlist', methods=['GET'])
+@app.route('/luckylocker/api/admin/greenlist', methods=['GET'])
 def get_greenlist():
     """获取所有绿通凭证"""
     conn = get_db()
@@ -660,7 +682,7 @@ def get_greenlist():
         record['status'] = status
     return jsonify({'success': True, 'records': records})
 
-@app.route('/api/admin/greenlist', methods=['POST'])
+@app.route('/luckylocker/api/admin/greenlist', methods=['POST'])
 def add_greenlist():
     """添加绿通凭证"""
     try:
@@ -703,7 +725,7 @@ def add_greenlist():
         print("=" * 50)
         return jsonify({'success': False, 'message': f'添加失败：{str(e)}'})
 
-@app.route('/api/admin/greenlist/<int:record_id>', methods=['DELETE'])
+@app.route('/luckylocker/api/admin/greenlist/<int:record_id>', methods=['DELETE'])
 def delete_greenlist(record_id):
     """删除绿通凭证"""
     conn = get_db()
@@ -713,7 +735,7 @@ def delete_greenlist(record_id):
     conn.close()
     return jsonify({'success': True, 'message': '删除成功'})
 
-@app.route('/api/verify_green_code', methods=['POST'])
+@app.route('/luckylocker/api/verify_green_code', methods=['POST'])
 def verify_green_code():
     """验证绿通凭证 (遍历查找有效项)"""
     data = request.json
@@ -753,7 +775,7 @@ def verify_green_code():
 
 # ==================== 产品池管理API ====================
 
-@app.route('/api/admin/product_pool', methods=['GET'])
+@app.route('/luckylocker/api/admin/product_pool', methods=['GET'])
 def get_product_pool():
     """获取产品池"""
     conn = get_db()
@@ -763,7 +785,7 @@ def get_product_pool():
     conn.close()
     return jsonify({'success': True, 'products': products})
 
-@app.route('/api/admin/product_pool', methods=['POST'])
+@app.route('/luckylocker/api/admin/product_pool', methods=['POST'])
 def add_product():
     """添加产品到产品池"""
     data = request.json
@@ -780,7 +802,7 @@ def add_product():
     conn.close()
     return jsonify({'success': True, 'message': '产品添加成功'})
 
-@app.route('/api/admin/product_pool/<int:product_id>', methods=['PUT'])
+@app.route('/luckylocker/api/admin/product_pool/<int:product_id>', methods=['PUT'])
 def update_product(product_id):
     """更新产品状态"""
     data = request.json
@@ -802,7 +824,7 @@ def update_product(product_id):
     conn.close()
     return jsonify({'success': True, 'message': '更新成功'})
 
-@app.route('/api/admin/product_pool/<int:product_id>', methods=['DELETE'])
+@app.route('/luckylocker/api/admin/product_pool/<int:product_id>', methods=['DELETE'])
 def delete_product(product_id):
     """删除产品"""
     conn = get_db()
@@ -814,7 +836,7 @@ def delete_product(product_id):
 
 # ==================== 客服二维码管理API ====================
 
-@app.route('/api/qrcode', methods=['GET'])
+@app.route('/luckylocker/api/qrcode', methods=['GET'])
 def get_qrcode():
     """获取客服二维码"""
     qrcode_path = get_system_config('qrcode_path')
@@ -854,7 +876,7 @@ def get_qrcode():
     </svg>'''
     return svg_placeholder, 200, {'Content-Type': 'image/svg+xml'}
 
-@app.route('/api/admin/upload_qrcode', methods=['POST'])
+@app.route('/luckylocker/api/admin/upload_qrcode', methods=['POST'])
 def upload_qrcode():
     """上传客服二维码"""
     if 'file' not in request.files:
@@ -881,7 +903,7 @@ def upload_qrcode():
     else:
         return jsonify({'success': False, 'message': '不支持的文件格式'})
 
-@app.route('/api/admin/qrcode_status', methods=['GET'])
+@app.route('/luckylocker/api/admin/qrcode_status', methods=['GET'])
 def get_qrcode_status():
     """获取当前二维码状态"""
     qrcode_path = get_system_config('qrcode_path')
