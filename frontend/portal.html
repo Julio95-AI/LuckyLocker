@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>julio98.dpdns.org - 应用门户</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 900px;
+            width: 100%;
+        }
+        
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 50px;
+        }
+        
+        .header h1 {
+            font-size: 48px;
+            margin-bottom: 10px;
+            text-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        
+        .header p {
+            font-size: 18px;
+            opacity: 0.9;
+        }
+        
+        .apps-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+        
+        .app-card {
+            background: white;
+            border-radius: 20px;
+            padding: 40px 30px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            text-decoration: none;
+            color: inherit;
+            display: block;
+        }
+        
+        .app-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+        }
+        
+        .app-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+        }
+        
+        .app-name {
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        
+        .app-desc {
+            font-size: 14px;
+            color: #666;
+            line-height: 1.6;
+        }
+        
+        .app-status {
+            display: inline-block;
+            margin-top: 15px;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        
+        .status-active {
+            background: #4CAF50;
+            color: white;
+        }
+        
+        .status-coming {
+            background: #FFC107;
+            color: white;
+        }
+        
+        .footer {
+            text-align: center;
+            color: white;
+            font-size: 14px;
+            opacity: 0.8;
+        }
+        
+        .footer a {
+            color: white;
+            text-decoration: underline;
+        }
+        
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 36px;
+            }
+            
+            .apps-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🌟 应用中心</h1>
+            <p>julio98.dpdns.org</p>
+        </div>
+        
+        <div class="apps-grid">
+            <!-- LuckyLocker 抽奖系统 -->
+            <a href="/" class="app-card">
+                <div class="app-icon">🎁</div>
+                <div class="app-name">LuckyLocker</div>
+                <div class="app-desc">
+                    幸运格子柜抽奖系统<br>
+                    每天2位幸运顾客免费拿<br>
+                    iPhone、小米手机等你拿
+                </div>
+                <span class="app-status status-active">运行中</span>
+            </a>
+            
+            <!-- 预留：未来的应用1 -->
+            <a href="#" class="app-card" onclick="alert('敬请期待！'); return false;">
+                <div class="app-icon">📱</div>
+                <div class="app-name">应用名称</div>
+                <div class="app-desc">
+                    这里是应用的简短描述<br>
+                    展示应用的核心功能<br>
+                    吸引用户点击使用
+                </div>
+                <span class="app-status status-coming">即将上线</span>
+            </a>
+            
+            <!-- 预留：未来的应用2 -->
+            <a href="#" class="app-card" onclick="alert('敬请期待！'); return false;">
+                <div class="app-icon">🎯</div>
+                <div class="app-name">应用名称</div>
+                <div class="app-desc">
+                    这里是应用的简短描述<br>
+                    展示应用的核心功能<br>
+                    吸引用户点击使用
+                </div>
+                <span class="app-status status-coming">即将上线</span>
+            </a>
+        </div>
+        
+        <div class="footer">
+            <p>© 2026 julio98.dpdns.org | <a href="/admin.html">管理后台</a></p>
+        </div>
+    </div>
+</body>
+</html>
