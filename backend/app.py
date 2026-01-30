@@ -928,8 +928,9 @@ if __name__ == '__main__':
     print("=" * 50)
     print(f"LuckyLocker 抽奖系统启动 (v{VERSION})")
     print(f"运行模式: {'开发模式' if debug else '生产模式'}")
-    print(f"前端访问: http://localhost:{port}")
-    print(f"管理后台: http://localhost:{port}/admin.html")
+    print(f"门户网址: http://localhost:{port}")
+    print(f"前端访问: http://localhost:{port}/luckylocker/")
+    print(f"管理后台: http://localhost:{port}/luckylocker/admin.html")
     print("=" * 50)
     
     # 启动Flask服务
