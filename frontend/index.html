@@ -376,9 +376,59 @@
         <div class="footer">LuckyLocker v0.1.0</div>
     </div>
 
+    <!-- 微信浏览器引导蒙层 -->
+    <div id="wechatGuide" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.95); z-index: 10000; padding: 20px;">
+        <div style="position: absolute; top: 20px; right: 20px;">
+            <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120'%3E%3Ctext x='10' y='40' font-size='36' fill='%23ff6b6b'%3E👆%3C/text%3E%3Ctext x='5' y='80' font-size='16' fill='white'%3E点击右上角%3C/text%3E%3Ctext x='20' y='100' font-size='18' fill='%23ffd93d'%3E⋯%3C/text%3E%3C/svg%3E" alt="引导图" style="width: 120px; height: 120px; filter: drop-shadow(0 4px 8px rgba(255,255,255,0.3));">
+        </div>
+        <div style="text-align: center; padding-top: 180px; color: white;">
+            <div style="font-size: 24px; font-weight: bold; margin-bottom: 30px; color: #ffd93d;">
+                🎁 在浏览器中打开参与抽奖
+            </div>
+            <div style="background: rgba(255,255,255,0.1); border-radius: 12px; padding: 25px; margin: 0 auto; max-width: 350px; backdrop-filter: blur(10px);">
+                <div style="font-size: 18px; line-height: 2; text-align: left;">
+                    <div style="margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.2);">
+                        <span style="color: #ffd93d;">1️⃣</span> 点击右上角 <span style="font-size: 24px; color: #4ecdc4;">⋯</span> 菜单
+                    </div>
+                    <div style="margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.2);">
+                        <span style="color: #ffd93d;">2️⃣</span> 选择 <span style="color: #4ecdc4; font-weight: bold;">"在浏览器中打开"</span>
+                    </div>
+                    <div>
+                        <span style="color: #ffd93d;">3️⃣</span> 即可正常参与抽奖 🎉
+                    </div>
+                </div>
+            </div>
+            <div style="margin-top: 30px; padding: 20px; background: rgba(255,107,107,0.2); border-radius: 8px; border: 2px solid #ff6b6b;">
+                <div style="font-size: 16px; margin-bottom: 10px; color: #ffd93d;">📋 或复制链接到浏览器访问：</div>
+                <div style="font-size: 18px; color: white; word-break: break-all; background: rgba(0,0,0,0.3); padding: 12px; border-radius: 6px; font-family: monospace;">
+                    julio98.dpdns.org
+                </div>
+            </div>
+            <div style="margin-top: 25px; font-size: 14px; color: #999;">
+                由于微信限制，需要在浏览器中打开<br>给您带来不便，敬请谅解 🙏
+            </div>
+        </div>
+    </div>
+
     <script>
         const API_BASE = '';
         let isDrawing = false;
+        
+        // 检测微信浏览器
+        function isWechatBrowser() {
+            const ua = navigator.userAgent.toLowerCase();
+            return ua.includes('micromessenger');
+        }
+        
+        // 如果是微信浏览器，显示引导页
+        if (isWechatBrowser()) {
+            document.getElementById('wechatGuide').style.display = 'block';
+            // 允许用户点击蒙层关闭（强制体验）
+            document.getElementById('wechatGuide').addEventListener('click', function() {
+                // 不允许关闭，强制引导用户去浏览器打开
+                // this.style.display = 'none';
+            });
+        }
         
         // 加载状态
         async function loadStatus() {

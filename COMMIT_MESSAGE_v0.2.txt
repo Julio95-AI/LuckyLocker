@@ -1,0 +1,87 @@
+Release v0.2.0: 新增完整部署文档体系和项目结构优化
+
+## 🚀 主要更新
+
+### 部署相关 (Deployment)
+- 新增完整部署文档体系，支持多种云平台
+- 新增 Render 平台一键部署配置
+- 支持环境变量配置，适配各种云平台
+- 新增 Cloudflare Worker 防休眠脚本
+
+### 文档结构 (Documentation)
+- 整理项目文档到 docs/ 文件夹
+- 新增 6 份详细的部署指南文档
+- 所有文档使用英文文件名（避免跨平台问题）
+
+### 工具脚本 (Scripts)
+- 移动所有脚本到 scripts/ 文件夹
+- 新增项目清理脚本（Windows + Linux）
+
+## 📝 详细变更
+
+### 新增文件
+
+**部署配置**:
+- `render.yaml` - Render 平台自动部署配置
+- `.gitignore` - Git 忽略配置（防止数据库文件误提交）
+
+**部署文档** (docs/deployment/):
+- `QUICKSTART.md` - 快速部署指南（5步完成）
+- `DEPLOY_PUBLIC.md` - 完整部署方案详解
+- `DEPLOYMENT_COMPARISON.md` - 方案全对比表
+- `DEPLOYMENT_CHECKLIST.md` - 可视化部署检查清单
+- `DEPLOY_GUIDE.md` - 部署指南索引
+- `DEPLOY.md` - 传统服务器部署（从根目录移入）
+
+**项目文档** (docs/):
+- `STRUCTURE.md` - 项目结构说明
+- `WECHAT_MINIPROGRAM_DESIGN.md` - 微信小程序设计文档（重命名）
+
+**工具脚本** (scripts/):
+- `cleanup.sh` - Linux 清理脚本（从根目录移入）
+- `cleanup.bat` - Windows 清理脚本（从根目录移入）
+- `cloudflare-worker-keepalive.js` - Cloudflare Worker 脚本
+
+### 修改文件
+
+**代码更新**:
+- `backend/app.py` - 支持 PORT 和 DEBUG 环境变量
+- `requirements.txt` - 新增 gunicorn 依赖
+
+**文档更新**:
+- `README.md` - 更新部署章节，添加文档导航
+- `CHANGELOG.md` - 新增 v0.2.0 更新日志
+
+### 文件移动/重命名
+
+- `doc/基于域名的...md` → `docs/WECHAT_MINIPROGRAM_DESIGN.md`
+- `DEPLOY.md` → `docs/deployment/DEPLOY.md`
+- `cleanup.sh` → `scripts/cleanup.sh`
+- `cleanup.bat` → `scripts/cleanup.bat`
+
+### 删除文件
+
+- `doc/` 文件夹（内容已移至 docs/）
+
+## 🎯 部署方案支持
+
+本版本支持以下部署方案：
+
+1. **Render 免费版** - ¥0/月，适合测试和小流量
+2. **Railway** - ¥35/月，适合中流量活动
+3. **Cloudflare Tunnel** - ¥0/月，本地服务器穿透
+4. **腾讯云/阿里云** - ¥70+/月，正式商用
+
+推荐新手从 Render 免费版开始！
+
+## 📚 快速开始
+
+查看部署文档：
+- 快速入门: docs/deployment/QUICKSTART.md
+- 文档导航: docs/deployment/DEPLOY_GUIDE.md
+
+## 🔗 相关链接
+
+- 文档结构说明: docs/STRUCTURE.md
+- 更新日志: CHANGELOG.md
+- 项目主页: README.md
